@@ -1,0 +1,23 @@
+---
+description: This rule explains NextJS/React component patterns, hooks usage, and best practices.
+globs: 
+alwaysApply: false
+---
+
+- Use functional components with hooks instead of class components
+- Use custom hooks for reusable logic
+- Use the Context API for state management when needed
+- Use proper prop validation with PropTypes
+- Use fragments to avoid unnecessary DOM elements
+- Use proper list rendering with keys
+- Prefer composition over inheritance
+- don't import React from 'react' in the root of the project.
+- if we have a component without children, use self closing tags.
+- when importing Link component, always import it from 'next/link'.
+- always await for params and cookies for Server Components
+- Use `React.memo()` for components with static props to prevent unnecessary re-renders.
+- Limit 'use client':
+  - Favor server components and Next.js SSR.
+  - Use only for Web API access in small components.
+  - Avoid for data fetching or state management.
+- Optimize Web Vitals (LCP, CLS, FID).

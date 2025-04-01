@@ -1,0 +1,32 @@
+---
+description: 
+globs: .css,.jsx,.tsx
+alwaysApply: false
+---
+
+- Use @apply for repeated patterns when necessary:
+
+```css
+@layer components {
+  .classNameExample {
+    @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600;
+  }
+}
+```
+
+- Use spacing utilities for consistent layout:
+
+```jsx
+<div class="space-y-4">
+  <div>Item 1</div>
+  <div>Item 2</div>
+</div>
+```
+
+- Use arbitrary values for specific requirements:
+
+```jsx
+<div class="top-[117px] grid-cols-[1fr_2fr]">
+  <!-- Custom positioning and grid layout -->
+</div>
+```
