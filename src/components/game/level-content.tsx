@@ -1,6 +1,9 @@
 'use client';
 
+import { memo } from 'react';
 import type { Level } from '@/lib/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface LevelContentProps {
   level: Level;
@@ -9,43 +12,45 @@ interface LevelContentProps {
   isCompleted: boolean;
 }
 
-export function LevelContent({ level, isPlaying, isCompleted }: LevelContentProps) {
+export const LevelContent = memo(function LevelContent({
+  level,
+  isPlaying,
+  isCompleted,
+}: LevelContentProps) {
   return (
-    <div className="bg-card text-card-foreground mb-4 rounded-lg border p-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">{level.title}</h3>
-        <div
-          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
-            isCompleted
-              ? 'border-transparent bg-green-500 text-white'
-              : isPlaying
-                ? 'bg-primary text-primary-foreground border-transparent'
-                : 'text-foreground'
-          }`}
-        >
-          {isCompleted ? 'Completed' : isPlaying ? 'In Progress' : 'Instructions'}
+    <Card className="mb-4">
+      <CardHeader className="pt-4 pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">{level.title}</CardTitle>
+          <Badge
+            variant={isCompleted ? 'success' : isPlaying ? 'default' : 'outline'}
+            className={isCompleted ? 'bg-green-500 hover:bg-green-500' : ''}
+          >
+            {isCompleted ? 'Completed' : isPlaying ? 'In Progress' : 'Instructions'}
+          </Badge>
         </div>
-      </div>
+      </CardHeader>
+      <CardContent>
+        <p className="text-muted-foreground mt-2">{level.content}</p>
 
-      <p className="text-muted-foreground mt-2">{level.content}</p>
-
-      <div className="bg-muted/50 mt-4 rounded-md p-6">
-        {isPlaying && !isCompleted ? (
-          <div className="flex flex-col items-center">
-            <p className="mb-3 text-center">Use the buttons below to continue.</p>
-          </div>
-        ) : isCompleted ? (
-          <div className="flex flex-col items-center">
-            <p className="mb-2 text-center font-semibold text-green-600">Level Completed! ✓</p>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center">
-            <p className="mb-3 text-center">
-              Read the instructions above and click Start to begin.
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
+        <div className="bg-muted/50 mt-4 rounded-md p-6">
+          {isPlaying && !isCompleted ? (
+            <div className="flex flex-col items-center">
+              <p className="mb-3 text-center">Use the buttons below to continue.</p>
+            </div>
+          ) : isCompleted ? (
+            <div className="flex flex-col items-center">
+              <p className="mb-2 text-center font-semibold text-green-600">Level Completed! ✓</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center">
+              <p className="mb-3 text-center">
+                Read the instructions above and click Start to begin.
+              </p>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
-}
+});

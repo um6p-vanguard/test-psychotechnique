@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo, useCallback, useRef } from 'react';
 import type { Game } from '@/lib/types';
 import { submitLevelAnswer } from '@/lib/api';
 import { LevelContent } from './level-content';
@@ -12,7 +12,7 @@ interface CurrentGameAreaProps {
   onLevelComplete: (gameId: string, levelId: string, isGameFinished: boolean) => void;
 }
 
-export function CurrentGameArea({
+export const CurrentGameArea = memo(function CurrentGameArea({
   game,
   currentLevelIndex,
   onLevelComplete,
@@ -21,53 +21,68 @@ export function CurrentGameArea({
   const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  // Track if level has been submitted already to prevent multiple submissions
+  const hasSubmittedRef = useRef(false);
 
   const currentLevel = game.levels[currentLevelIndex];
   const totalLevels = game.levels.length;
   const isFirstLevel = currentLevelIndex === 0;
   const isLastLevel = currentLevelIndex === totalLevels - 1;
 
-  async function handleLevelSubmit(finishGame: boolean): Promise<void> {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await submitLevelAnswer(game.id, currentLevel.id);
-      if (result.success) {
-        setIsCompleted(true);
-        setIsPlaying(false);
-        onLevelComplete(game.id, currentLevel.id, finishGame);
-      } else setError('Failed to submit answer. Please try again.');
-    } catch (err) {
-      console.error('Error submitting level:', err);
-      setError('An unexpected error occurred. Please try again.');
-    }
-    setIsLoading(false);
-  }
+  const handleLevelSubmit = useCallback(
+    async (finishGame: boolean): Promise<void> => {
+      if (!currentLevel || hasSubmittedRef.current) return;
 
-  async function handleStart(): Promise<void> {
-    // Just advance to next level immediately
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await submitLevelAnswer(game.id, currentLevel.id);
+
+        if (response.success) {
+          setIsCompleted(true);
+          setIsPlaying(false);
+          // Mark this level as submitted to prevent resubmission
+          hasSubmittedRef.current = true;
+          onLevelComplete(game.id, currentLevel.id, finishGame);
+        } else {
+          setError(response.error || 'Failed to submit answer. Please try again.');
+        }
+      } catch (err) {
+        console.error('Error submitting level:', err);
+        setError('An unexpected error occurred. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [currentLevel, game.id, onLevelComplete],
+  );
+
+  const handleStart = useCallback(async (): Promise<void> => {
+    if (hasSubmittedRef.current) return;
+    setIsPlaying(true);
     await handleLevelSubmit(false);
-  }
+  }, [handleLevelSubmit]);
 
-  async function handleNext(): Promise<void> {
+  const handleNext = useCallback(async (): Promise<void> => {
+    if (hasSubmittedRef.current) return;
     await handleLevelSubmit(false);
-  }
+  }, [handleLevelSubmit]);
 
-  async function handleFinish(): Promise<void> {
+  const handleFinish = useCallback(async (): Promise<void> => {
+    if (hasSubmittedRef.current) return;
     await handleLevelSubmit(true);
-  }
+  }, [handleLevelSubmit]);
 
   // Reset state when level changes
   useEffect(() => {
     setIsPlaying(false);
     setIsCompleted(false);
     setError(null);
-  }, [currentLevel.id]);
+    hasSubmittedRef.current = false;
+  }, [currentLevel?.id]);
 
-  if (!currentLevel) {
-    // Should not happen with correct state management, but good practice
-    return <div>Error: Level data not found.</div>;
-  }
+  if (!currentLevel) return <div>Error: Level data not found.</div>;
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4">
@@ -92,7 +107,11 @@ export function CurrentGameArea({
         onStart={handleStart}
         onNext={handleNext}
         onFinish={handleFinish}
+        isDisabled={hasSubmittedRef.current && isCompleted}
       />
     </div>
   );
-}
+});
+
+// Also export as default for dynamic import
+export default CurrentGameArea;

@@ -4,7 +4,7 @@ export const GAMES_DATA: Game[] = [
   {
     id: 'game-1',
     name: 'Memory Match',
-    icon: '🧠', // Simple emoji placeholder
+    icon: 'brain',
     levels: [
       {
         id: 'g1-l1',
@@ -22,7 +22,7 @@ export const GAMES_DATA: Game[] = [
   {
     id: 'game-2',
     name: 'Sequence Order',
-    icon: '🔢',
+    icon: 'list-ordered',
     levels: [
       {
         id: 'g2-l1',
@@ -44,7 +44,7 @@ export const GAMES_DATA: Game[] = [
   {
     id: 'game-3',
     name: 'Word Find',
-    icon: '🔍',
+    icon: 'search',
     levels: [
       {
         id: 'g3-l1',
@@ -62,7 +62,7 @@ export const GAMES_DATA: Game[] = [
   {
     id: 'game-4',
     name: 'Quick Math',
-    icon: '➕',
+    icon: 'calculator',
     levels: [
       {
         id: 'g4-l1',
@@ -80,7 +80,7 @@ export const GAMES_DATA: Game[] = [
   {
     id: 'game-5',
     name: 'Logic Puzzle',
-    icon: '🧩',
+    icon: 'puzzle',
     levels: [
       {
         id: 'g5-l1',
@@ -102,7 +102,7 @@ export const GAMES_DATA: Game[] = [
   {
     id: 'game-6',
     name: 'Typing Test',
-    icon: '⌨️',
+    icon: 'keyboard',
     levels: [
       {
         id: 'g6-l1',
