@@ -86,26 +86,20 @@ export const GameProgressBar = memo(function GameProgressBar({
                 const isActive = status === 'active';
                 const isPassed = status === 'passed';
                 const isPending = status === 'pending';
-                const isClickable = isActive;
                 const gameIcon = game.icon && iconMap[game.icon] ? iconMap[game.icon] : index + 1;
 
                 return (
                   <Tooltip key={game.id}>
                     <TooltipTrigger asChild>
                       <div className="flex w-24 flex-col items-center">
-                        <button
-                          onClick={
-                            isClickable && onGameSelect ? () => onGameSelect(index) : undefined
-                          }
-                          disabled={!isClickable || !onGameSelect}
+                        <div
                           aria-label={`${game.name} ${status}`}
                           className={cn(
                             gameIndicatorStyles({
                               status: status,
                               size: isActive ? 'large' : 'default',
                             }),
-                            isClickable && onGameSelect ? 'cursor-pointer' : 'cursor-not-allowed',
-                            'mb-3',
+                            'mb-3 cursor-default',
                           )}
                         >
                           {isPassed ? (
@@ -117,7 +111,7 @@ export const GameProgressBar = memo(function GameProgressBar({
                           ) : (
                             gameIcon
                           )}
-                        </button>
+                        </div>
 
                         <span
                           className={cn(

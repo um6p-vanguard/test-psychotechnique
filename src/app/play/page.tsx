@@ -158,7 +158,6 @@ export default function PlayPage() {
         games={progressBarGames}
         gameStatuses={gameStatuses}
         currentGameIndex={currentGameIndex}
-        onGameSelect={handleGameSelect}
       />
 
       <Suspense fallback={<GameAreaSkeleton />}>

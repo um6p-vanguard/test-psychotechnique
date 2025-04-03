@@ -68,7 +68,10 @@ export async function submitLevelAnswer(
     console.error(`Failed to submit answer for ${gameId}, ${levelId}.`);
     return {
       success: false,
-      error: 'Server rejected the answer. Please try again.',
+      // This is just an example error message - in a real app this would be the actual error from the server
+      // error: 'Server rejected the answer. Please try again.',
+      error:
+        'This is just an example error message - in a real app this would be the actual error from the server',
     };
   } catch (error) {
     // Handle abort or other errors
