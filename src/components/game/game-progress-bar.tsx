@@ -1,20 +1,24 @@
 'use client';
 
 import { memo } from 'react';
-import type { Game, GameStatus } from '@/lib/types';
-import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+import { cva } from 'class-variance-authority';
 import {
   Brain,
-  ListOrdered,
-  Search,
   Calculator,
-  Puzzle,
-  Keyboard,
   CheckCircle2,
+  Keyboard,
+  ListOrdered,
   Lock,
+  Puzzle,
+  Search,
 } from 'lucide-react';
-import { cva } from 'class-variance-authority';
+
+import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+import type { Game, GameStatus } from '@/lib/types';
+import { cn } from '@/lib/utils';
 
 interface GameProgressBarProps {
   games: Pick<Game, 'id' | 'icon' | 'name'>[];
@@ -39,10 +43,9 @@ const gameIndicatorStyles = cva(
   {
     variants: {
       status: {
-        active: 'border-primary bg-primary text-primary-foreground scale-110 shadow-md z-10',
-        passed:
-          'border-green-600 bg-green-500 text-white hover:brightness-105 hover:scale-105 z-10',
-        pending: 'border-border bg-muted/60 text-muted-foreground z-10',
+        active: 'border-primary bg-primary text-primary-foreground scale-110 shadow-md',
+        passed: 'border-green-600 bg-green-500 text-white hover:brightness-105 hover:scale-105',
+        pending: 'border-border bg-muted text-muted-foreground',
       },
       size: {
         default: 'h-12 w-12',
@@ -67,21 +70,17 @@ export const GameProgressBar = memo(function GameProgressBar({
     games.length <= 1 ? 100 : (currentGameIndex / (games.length - 1)) * 100;
 
   return (
-    <div className="mt-6 mb-12">
-      <div className="relative h-20">
-        {/* Background track */}
-        <div className="bg-muted/70 absolute top-1/2 right-0 left-0 h-1.5 -translate-y-1/2 rounded-full"></div>
-
-        {/* Progress indicator */}
-        <div
-          className="bg-primary absolute top-1/2 left-0 h-1.5 -translate-y-1/2 rounded-full transition-all duration-500 ease-in-out"
-          style={{ width: `${progressPercentage}%` }}
-        />
+    <div className="relative mx-auto mt-6 mb-12 max-w-4xl">
+      <div className="relative h-28">
+        {/* Progress bar */}
+        <div className="absolute top-1/2 right-6 left-6 -translate-y-px">
+          <Progress value={progressPercentage} className="bg-border h-0.5" />
+        </div>
 
         {/* Game indicators container */}
-        <div className="absolute inset-0 flex items-center">
+        <div className="absolute inset-x-0 top-6">
           <TooltipProvider delayDuration={300}>
-            <div className="flex w-full justify-between px-4 md:px-10">
+            <div className="flex items-center justify-between px-4">
               {games.map((game, index) => {
                 const status = gameStatuses[index];
                 const isActive = status === 'active';
@@ -93,7 +92,7 @@ export const GameProgressBar = memo(function GameProgressBar({
                 return (
                   <Tooltip key={game.id}>
                     <TooltipTrigger asChild>
-                      <div className="flex flex-col items-center">
+                      <div className="flex w-24 flex-col items-center">
                         <button
                           onClick={
                             isClickable && onGameSelect ? () => onGameSelect(index) : undefined
@@ -106,6 +105,7 @@ export const GameProgressBar = memo(function GameProgressBar({
                               size: isActive ? 'large' : 'default',
                             }),
                             isClickable && onGameSelect ? 'cursor-pointer' : 'cursor-not-allowed',
+                            'mb-3',
                           )}
                         >
                           {isPassed ? (
@@ -119,18 +119,14 @@ export const GameProgressBar = memo(function GameProgressBar({
                           )}
                         </button>
 
-                        <div className="mt-2 flex h-6 items-center">
-                          {(isActive || isPassed) && (
-                            <span
-                              className={cn(
-                                'text-xs font-medium whitespace-nowrap transition-all duration-300',
-                                isActive ? 'text-primary' : 'text-muted-foreground',
-                              )}
-                            >
-                              {game.name}
-                            </span>
+                        <span
+                          className={cn(
+                            'text-center text-xs font-medium transition-colors',
+                            isActive ? 'text-primary' : 'text-muted-foreground',
                           )}
-                        </div>
+                        >
+                          {game.name}
+                        </span>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent

@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useEffect, memo, useCallback, useRef } from 'react';
-import type { Game } from '@/lib/types';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
+
 import { submitLevelAnswer } from '@/lib/api';
-import { LevelContent } from './level-content';
+import type { Game } from '@/lib/types';
+
 import { ActionButtons } from './action-buttons';
+import { GAME_COMPONENTS } from './games';
+import { LevelContent } from './level-content';
 
 interface CurrentGameAreaProps {
   game: Game;
@@ -19,15 +22,20 @@ export const CurrentGameArea = memo(function CurrentGameArea({
 }: CurrentGameAreaProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isGameStarted, setIsGameStarted] = useState(currentLevelIndex > 0);
+  const [isPlaying, setIsPlaying] = useState(currentLevelIndex > 0);
   const [isCompleted, setIsCompleted] = useState(false);
-  // Track if level has been submitted already to prevent multiple submissions
   const hasSubmittedRef = useRef(false);
+  const prevLevelIndexRef = useRef<number>(currentLevelIndex);
+  const prevGameIdRef = useRef<string>(game.id);
 
   const currentLevel = game.levels[currentLevelIndex];
   const totalLevels = game.levels.length;
   const isFirstLevel = currentLevelIndex === 0;
   const isLastLevel = currentLevelIndex === totalLevels - 1;
+
+  // Get the appropriate game component
+  const GameComponent = GAME_COMPONENTS[game.id];
 
   const handleLevelSubmit = useCallback(
     async (finishGame: boolean): Promise<void> => {
@@ -42,7 +50,6 @@ export const CurrentGameArea = memo(function CurrentGameArea({
         if (response.success) {
           setIsCompleted(true);
           setIsPlaying(false);
-          // Mark this level as submitted to prevent resubmission
           hasSubmittedRef.current = true;
           onLevelComplete(game.id, currentLevel.id, finishGame);
         } else {
@@ -60,27 +67,59 @@ export const CurrentGameArea = memo(function CurrentGameArea({
 
   const handleStart = useCallback(async (): Promise<void> => {
     if (hasSubmittedRef.current) return;
+    setIsGameStarted(true);
     setIsPlaying(true);
-    await handleLevelSubmit(false);
-  }, [handleLevelSubmit]);
+  }, []);
 
   const handleNext = useCallback(async (): Promise<void> => {
     if (hasSubmittedRef.current) return;
+    setIsGameStarted(true);
     await handleLevelSubmit(false);
   }, [handleLevelSubmit]);
 
   const handleFinish = useCallback(async (): Promise<void> => {
     if (hasSubmittedRef.current) return;
+    setIsGameStarted(true);
     await handleLevelSubmit(true);
   }, [handleLevelSubmit]);
 
-  // Reset state when level changes
+  // Handle level or game changes
   useEffect(() => {
-    setIsPlaying(false);
-    setIsCompleted(false);
-    setError(null);
-    hasSubmittedRef.current = false;
-  }, [currentLevel?.id]);
+    // Determine if we've changed game or level
+    const gameChanged = prevGameIdRef.current !== game.id;
+    const levelChanged = prevLevelIndexRef.current !== currentLevelIndex;
+
+    if (gameChanged || levelChanged) {
+      // Reset common state for any change
+      setIsCompleted(false);
+      setError(null);
+      hasSubmittedRef.current = false;
+
+      if (gameChanged) {
+        // Game has changed - start fresh
+        if (isFirstLevel) {
+          // First level of new game needs manual start
+          setIsGameStarted(false);
+          setIsPlaying(false);
+        } else {
+          // Non-first level of any game should auto-start
+          setIsGameStarted(true);
+          setIsPlaying(true);
+        }
+      } else if (levelChanged && !gameChanged) {
+        // Only the level changed within the same game
+        if (currentLevelIndex > 0) {
+          // Any non-first level should auto-play
+          setIsGameStarted(true);
+          setIsPlaying(true);
+        }
+      }
+
+      // Update refs to current values
+      prevGameIdRef.current = game.id;
+      prevLevelIndexRef.current = currentLevelIndex;
+    }
+  }, [game.id, currentLevelIndex, isFirstLevel]);
 
   if (!currentLevel) return <div>Error: Level data not found.</div>;
 
@@ -91,6 +130,7 @@ export const CurrentGameArea = memo(function CurrentGameArea({
         Level {currentLevelIndex + 1} / {totalLevels}
       </p>
 
+      {/* Always show level content/rules */}
       <LevelContent
         level={currentLevel}
         gameId={game.id}
@@ -98,12 +138,25 @@ export const CurrentGameArea = memo(function CurrentGameArea({
         isCompleted={isCompleted}
       />
 
-      {error && <p className="text-destructive mb-4 text-center">{error}</p>}
+      {/* Show game component only when playing */}
+      {isPlaying && !isCompleted && GameComponent && (
+        <div className="mb-6">
+          <GameComponent level={currentLevel} onComplete={() => handleLevelSubmit(isLastLevel)} />
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-4 text-center">
+          <p className="text-destructive">{error}</p>
+        </div>
+      )}
 
       <ActionButtons
         isFirstLevel={isFirstLevel}
         isLastLevel={isLastLevel}
         isLoading={isLoading}
+        isPlaying={isPlaying}
+        isGameStarted={isGameStarted}
         onStart={handleStart}
         onNext={handleNext}
         onFinish={handleFinish}

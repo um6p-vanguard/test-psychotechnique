@@ -1,173 +1,116 @@
 'use client';
 
-import { useState, useMemo, useCallback, useTransition } from 'react';
-import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
+import { useRouter } from 'next/navigation';
+
+import { ArrowRight, Brain, Clock, Lightbulb, Trophy } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+
 import { GAMES_DATA } from '@/lib/data';
-import type { GameStatus } from '@/lib/types';
-import { GameProgressBar } from '@/components/game/game-progress-bar';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
-import { ErrorBoundary } from '@/components/ui/error-boundary';
 
-// Dynamically import the CurrentGameArea to reduce initial load
-const CurrentGameArea = dynamic(
-  () =>
-    import('@/components/game/current-game-area').then((mod) => ({ default: mod.CurrentGameArea })),
-  {
-    loading: () => <GameAreaSkeleton />,
-    ssr: false,
-  },
-);
+export default function HomePage() {
+  const router = useRouter();
 
-// Initialize game statuses: first game active, others pending
-const initialGameStatuses: GameStatus[] = GAMES_DATA.map((_, index) =>
-  index === 0 ? 'active' : 'pending',
-);
-
-function GameAreaSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4 px-4">
-      <div className="flex flex-col items-center space-y-2">
-        <Skeleton className="h-8 w-60" />
-        <Skeleton className="h-4 w-24" />
+    <main className="container mx-auto flex flex-col items-center gap-8 px-4 py-16">
+      <div className="text-center">
+        <h1 className="mb-6 text-4xl font-bold">Brain Games Challenge</h1>
+        <p className="text-muted-foreground mx-auto mb-12 max-w-2xl text-lg">
+          Welcome to a collection of mind-bending puzzles and games designed to test your cognitive
+          skills. Complete all games to become a mental master!
+        </p>
       </div>
-      <Skeleton className="h-64 w-full rounded-lg" />
-      <div className="flex justify-center">
-        <Skeleton className="h-10 w-24" />
+
+      <div className="grid w-full max-w-5xl gap-8 lg:grid-cols-2">
+        {/* Game Collection Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Game Collection</CardTitle>
+            <CardDescription>
+              {GAMES_DATA.length} games with{' '}
+              {GAMES_DATA.reduce((acc, game) => acc + game.levels.length, 0)} total levels
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4">
+              {GAMES_DATA.map((game, index) => (
+                <div key={game.id} className="flex items-center gap-3">
+                  <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
+                    <span className="text-sm font-medium">{index + 1}</span>
+                  </div>
+                  <div>
+                    <h3 className="font-medium">{game.name}</h3>
+                    <p className="text-muted-foreground text-sm">{game.levels.length} levels</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Instructions Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Brain className="text-primary mr-2 h-5 w-5" />
+              How to Play
+            </CardTitle>
+            <CardDescription>Complete each game to unlock the next one</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-3">
+              <h3 className="flex items-center font-medium">
+                <Clock className="text-muted-foreground mr-2 h-5 w-5" />
+                Game Progression
+              </h3>
+              <ul className="text-muted-foreground ml-9 list-disc space-y-1 text-sm">
+                <li>Each game contains multiple levels of increasing difficulty</li>
+                <li>Complete all levels of a game to unlock the next game</li>
+                <li>Your progress is shown in the progress bar at the top</li>
+                <li>You cannot return to previous games or levels once completed</li>
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="flex items-center font-medium">
+                <Lightbulb className="text-muted-foreground mr-2 h-5 w-5" />
+                Tips for Success
+              </h3>
+              <ul className="text-muted-foreground ml-9 list-disc space-y-1 text-sm">
+                <li>Read the level instructions carefully before starting</li>
+                <li>Focus on one level at a time</li>
+                <li>Take breaks between games if needed</li>
+                <li>Use the "Start" button to begin each level</li>
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="flex items-center font-medium">
+                <Trophy className="text-muted-foreground mr-2 h-5 w-5" />
+                Winning the Challenge
+              </h3>
+              <p className="text-muted-foreground ml-9 text-sm">
+                Complete all {GAMES_DATA.length} games with their{' '}
+                {GAMES_DATA.reduce((acc, game) => acc + game.levels.length, 0)} levels to master the
+                Brain Games Challenge!
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
-  );
-}
 
-function CompletionMessage() {
-  return (
-    <div className="py-10 text-center">
-      <h2 className="text-2xl font-semibold text-green-600">Congratulations!</h2>
-      <p className="text-muted-foreground mt-2">You have completed all the games!</p>
-    </div>
-  );
-}
-
-function ErrorFallback({
-  error,
-  resetErrorBoundary,
-}: {
-  error: Error;
-  resetErrorBoundary: () => void;
-}) {
-  return (
-    <Alert variant="destructive" className="mx-auto max-w-md">
-      <AlertTriangle className="h-4 w-4" />
-      <AlertTitle>Error</AlertTitle>
-      <AlertDescription>
-        <p className="text-sm">Something went wrong loading the game content.</p>
-        <button
-          onClick={resetErrorBoundary}
-          className="mt-2 text-sm text-white underline hover:text-white/90"
-        >
-          Try again
-        </button>
-      </AlertDescription>
-    </Alert>
-  );
-}
-
-export default function PlayPage() {
-  const [isPending, startTransition] = useTransition();
-  const [currentGameIndex, setCurrentGameIndex] = useState(0);
-  const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
-  const [gameStatuses, setGameStatuses] = useState<GameStatus[]>(initialGameStatuses);
-
-  const currentGame = useMemo(() => {
-    if (currentGameIndex >= GAMES_DATA.length) return null; // All games completed
-    return GAMES_DATA[currentGameIndex];
-  }, [currentGameIndex]);
-
-  const handleLevelComplete = useCallback(
-    (_gameId: string, _levelId: string, isGameFinished: boolean) => {
-      if (!currentGame) return;
-
-      startTransition(() => {
-        if (isGameFinished) {
-          // --- Game Finished ---
-          const nextGameIndex = currentGameIndex + 1;
-          setGameStatuses((prev) => {
-            const newStatuses = [...prev];
-            newStatuses[currentGameIndex] = 'passed';
-
-            if (nextGameIndex < GAMES_DATA.length) newStatuses[nextGameIndex] = 'active';
-
-            return newStatuses;
-          });
-
-          setCurrentGameIndex(nextGameIndex);
-          setCurrentLevelIndex(0); // Start at the first level of the new game
-        } else {
-          // --- Next Level within the same game ---
-          const nextLevelIndex = currentLevelIndex + 1;
-          if (nextLevelIndex < currentGame.levels.length) setCurrentLevelIndex(nextLevelIndex);
-          else console.error('Attempted to move past the last level without finishing the game.');
-        }
-      });
-    },
-    [currentGame, currentGameIndex, currentLevelIndex],
-  );
-
-  const handleGameSelect = useCallback(
-    (index: number) => {
-      // Only allow selection of active games
-      if (gameStatuses[index] === 'active') {
-        startTransition(() => {
-          setCurrentGameIndex(index);
-          setCurrentLevelIndex(0); // Reset to the first level of the selected game
-        });
-      }
-    },
-    [gameStatuses],
-  );
-
-  // Prepare props for the progress bar (avoid passing full game objects)
-  const progressBarGames = useMemo(
-    () => GAMES_DATA.map(({ id, icon, name }) => ({ id, icon, name })),
-    [],
-  );
-
-  const handleErrorReset = useCallback(() => {
-    // Reset state to refresh the component if there was an error
-    startTransition(() => {
-      setCurrentLevelIndex(0);
-    });
-  }, []);
-
-  return (
-    <main className="container mx-auto px-4 py-8">
-      <h1 className="mb-8 text-center text-3xl font-bold">Game Progress</h1>
-
-      <GameProgressBar
-        games={progressBarGames}
-        gameStatuses={gameStatuses}
-        currentGameIndex={currentGameIndex}
-        onGameSelect={handleGameSelect}
-      />
-
-      <Suspense fallback={<GameAreaSkeleton />}>
-        {isPending ? (
-          <GameAreaSkeleton />
-        ) : currentGame ? (
-          <ErrorBoundary FallbackComponent={ErrorFallback} onReset={handleErrorReset}>
-            <CurrentGameArea
-              key={`game-${currentGame.id}-level-${currentLevelIndex}`}
-              game={currentGame}
-              currentLevelIndex={currentLevelIndex}
-              onLevelComplete={handleLevelComplete}
-            />
-          </ErrorBoundary>
-        ) : (
-          <CompletionMessage />
-        )}
-      </Suspense>
+      <Button onClick={() => router.push('/play')} size="lg" className="mt-4">
+        Start Playing
+        <ArrowRight className="ml-2 h-4 w-4" />
+      </Button>
     </main>
   );
 }
