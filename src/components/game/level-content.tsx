@@ -23,7 +23,7 @@ export const LevelContent = memo(function LevelContent({
 }: LevelContentProps) {
   return (
     <div className="space-y-4">
-      <GameInstructions level={level} gameId={gameId} />
+      <GameInstructions level={level} gameId={gameId} isPlaying={isPlaying} />
 
       {isCompleted && (
         <Card>

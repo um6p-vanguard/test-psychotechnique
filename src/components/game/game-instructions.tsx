@@ -1,7 +1,10 @@
 'use client';
 
-import { Brain, Clock, Gamepad2, Info } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
+import { Brain, ChevronDown, ChevronUp, Clock, Gamepad2, Info } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 import type { Level } from '@/lib/types';
@@ -9,6 +12,7 @@ import type { Level } from '@/lib/types';
 interface GameInstructionsProps {
   level: Level;
   gameId: string;
+  isPlaying?: boolean;
 }
 
 const GAME_SPECIFIC_INSTRUCTIONS = {
@@ -74,7 +78,14 @@ const GAME_SPECIFIC_INSTRUCTIONS = {
   },
 };
 
-export function GameInstructions({ level, gameId }: GameInstructionsProps) {
+export function GameInstructions({ level, gameId, isPlaying = false }: GameInstructionsProps) {
+  const [isExpanded, setIsExpanded] = useState(!isPlaying);
+
+  // Update expansion state when isPlaying changes
+  useEffect(() => {
+    setIsExpanded(!isPlaying);
+  }, [isPlaying]);
+
   const gameInstructions =
     GAME_SPECIFIC_INSTRUCTIONS[gameId as keyof typeof GAME_SPECIFIC_INSTRUCTIONS];
 
@@ -82,41 +93,54 @@ export function GameInstructions({ level, gameId }: GameInstructionsProps) {
 
   return (
     <Card className="mb-6">
-      <CardHeader className="space-y-1">
-        <div className="flex items-center gap-2">
-          <Brain className="text-primary h-5 w-5" />
-          <CardTitle className="text-xl">{gameInstructions.title}</CardTitle>
+      <CardHeader className="space-y-1 pb-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Brain className="text-primary h-5 w-5" />
+            <CardTitle className="text-xl">{gameInstructions.title}</CardTitle>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
         </div>
         <CardDescription>{gameInstructions.description}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 font-medium">
-            <Info className="text-muted-foreground h-4 w-4" />
-            Level Instructions
-          </div>
-          <p className="text-muted-foreground text-sm">{level.content}</p>
-        </div>
 
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 font-medium">
-            <Gamepad2 className="text-muted-foreground h-4 w-4" />
-            Game Rules
+      {isExpanded && (
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 font-medium">
+              <Info className="text-muted-foreground h-4 w-4" />
+              Level Instructions
+            </div>
+            <p className="text-muted-foreground text-sm">{level.content}</p>
           </div>
-          <ul className="text-muted-foreground ml-5 list-disc space-y-1 text-sm">
-            {gameInstructions.rules.map((rule, index) => (
-              <li key={index}>{rule}</li>
-            ))}
-          </ul>
-        </div>
 
-        <div className="bg-muted mt-4 flex items-center gap-2 rounded-md p-3">
-          <Clock className="text-muted-foreground h-4 w-4" />
-          <p className="text-muted-foreground text-sm">
-            Read the instructions carefully before starting. Good luck!
-          </p>
-        </div>
-      </CardContent>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 font-medium">
+              <Gamepad2 className="text-muted-foreground h-4 w-4" />
+              Game Rules
+            </div>
+            <ul className="text-muted-foreground ml-5 list-disc space-y-1 text-sm">
+              {gameInstructions.rules.map((rule, index) => (
+                <li key={index}>{rule}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="bg-muted mt-4 flex items-center gap-2 rounded-md p-3">
+            <Clock className="text-muted-foreground h-4 w-4" />
+            <p className="text-muted-foreground text-sm">
+              Read the instructions carefully before starting. Good luck!
+            </p>
+          </div>
+        </CardContent>
+      )}
     </Card>
   );
 }
