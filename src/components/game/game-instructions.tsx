@@ -76,6 +76,16 @@ const GAME_SPECIFIC_INSTRUCTIONS = {
       'Complete within time limit',
     ],
   },
+  'game-7': {
+    title: 'Memory Grid',
+    description: 'Test your spatial memory by remembering patterns in a grid',
+    rules: [
+      'Observe the highlighted cells carefully',
+      'Remember their positions in the grid',
+      'Recreate the pattern by clicking on the same cells',
+      'Difficulty increases with each level',
+    ],
+  },
 };
 
 export function GameInstructions({ level, gameId, isPlaying = false }: GameInstructionsProps) {

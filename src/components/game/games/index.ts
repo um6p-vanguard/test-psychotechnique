@@ -1,5 +1,6 @@
 import type { BaseGameProps } from './base-game';
 import { LogicPuzzle } from './logic-puzzle';
+import { MemoryGrid } from './memory-grid';
 import { MemoryMatch } from './memory-match';
 import { QuickMath } from './quick-math';
 import { SequenceOrder } from './sequence-order';
@@ -8,6 +9,7 @@ import { WordFind } from './word-find';
 
 export * from './base-game';
 export * from './memory-match';
+export * from './memory-grid';
 export * from './sequence-order';
 export * from './word-find';
 export * from './quick-math';
@@ -22,4 +24,5 @@ export const GAME_COMPONENTS: Record<string, React.ComponentType<BaseGameProps>>
   'game-4': QuickMath,
   'game-5': LogicPuzzle,
   'game-6': TypingTest,
+  'game-7': MemoryGrid,
 };
