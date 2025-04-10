@@ -11,7 +11,6 @@ import { AlertTriangle } from 'lucide-react';
 import { GameProgressBar } from '@/components/game/game-progress-bar';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { GAMES_DATA } from '@/lib/data';
@@ -61,30 +60,6 @@ function CompletionMessage() {
   );
 }
 
-function ErrorFallback({
-  error,
-  resetErrorBoundary,
-}: {
-  error: Error;
-  resetErrorBoundary: () => void;
-}) {
-  return (
-    <Alert variant="destructive" className="mx-auto max-w-md">
-      <AlertTriangle className="h-4 w-4" />
-      <AlertTitle>Error</AlertTitle>
-      <AlertDescription>
-        <p className="text-sm">Something went wrong loading the game content.</p>
-        <button
-          onClick={resetErrorBoundary}
-          className="mt-2 text-sm text-white underline hover:text-white/90"
-        >
-          Try again
-        </button>
-      </AlertDescription>
-    </Alert>
-  );
-}
-
 export default function PlayPage() {
   const [isPending, startTransition] = useTransition();
   const [currentGameIndex, setCurrentGameIndex] = useState(0);
@@ -126,31 +101,11 @@ export default function PlayPage() {
     [currentGame, currentGameIndex, currentLevelIndex],
   );
 
-  const handleGameSelect = useCallback(
-    (index: number) => {
-      // Only allow selection of active games
-      if (gameStatuses[index] === 'active') {
-        startTransition(() => {
-          setCurrentGameIndex(index);
-          setCurrentLevelIndex(0); // Reset to the first level of the selected game
-        });
-      }
-    },
-    [gameStatuses],
-  );
-
   // Prepare props for the progress bar (avoid passing full game objects)
   const progressBarGames = useMemo(
     () => GAMES_DATA.map(({ id, icon, name }) => ({ id, icon, name })),
     [],
   );
-
-  const handleErrorReset = useCallback(() => {
-    // Reset state to refresh the component if there was an error
-    startTransition(() => {
-      setCurrentLevelIndex(0);
-    });
-  }, []);
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -164,14 +119,12 @@ export default function PlayPage() {
         {isPending ? (
           <GameAreaSkeleton />
         ) : currentGame ? (
-          <ErrorBoundary FallbackComponent={ErrorFallback} onReset={handleErrorReset}>
-            <CurrentGameArea
-              key={`game-${currentGame.id}`}
-              game={currentGame}
-              currentLevelIndex={currentLevelIndex}
-              onLevelComplete={handleLevelComplete}
-            />
-          </ErrorBoundary>
+          <CurrentGameArea
+            key={`game-${currentGame.id}`}
+            game={currentGame}
+            currentLevelIndex={currentLevelIndex}
+            onLevelComplete={handleLevelComplete}
+          />
         ) : (
           <CompletionMessage />
         )}
