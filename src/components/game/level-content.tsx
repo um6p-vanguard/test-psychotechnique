@@ -10,14 +10,12 @@ interface LevelContentProps {
   level: Level;
   gameId: string;
   isPlaying: boolean;
-  isCompleted: boolean;
 }
 
 export const LevelContent = memo(function LevelContent({
   level,
   gameId,
   isPlaying,
-  isCompleted,
 }: LevelContentProps) {
   return (
     <div className="space-y-4">

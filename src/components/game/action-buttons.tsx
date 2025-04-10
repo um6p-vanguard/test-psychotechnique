@@ -10,8 +10,6 @@ interface ActionButtonsProps {
   isFirstLevel: boolean;
   isLastLevel: boolean;
   isLoading: boolean;
-  isDisabled?: boolean;
-  isPlaying: boolean;
   isGameStarted: boolean;
   onStart: () => Promise<void>;
   onNext: () => Promise<void>;
@@ -22,8 +20,6 @@ export const ActionButtons = memo(function ActionButtons({
   isFirstLevel,
   isLastLevel,
   isLoading,
-  isDisabled = false,
-  isPlaying,
   isGameStarted,
   onStart,
   onNext,
@@ -47,7 +43,7 @@ export const ActionButtons = memo(function ActionButtons({
     <div className="mt-6 flex justify-center">
       <Button
         onClick={() => actionHandler()}
-        disabled={isLoading || isDisabled}
+        disabled={isLoading}
         size="lg"
         variant="default"
         className="min-w-32 font-medium"

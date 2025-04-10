@@ -24,7 +24,6 @@ export const CurrentGameArea = memo(function CurrentGameArea({
   const [error, setError] = useState<string | null>(null);
   const [isGameStarted, setIsGameStarted] = useState(currentLevelIndex > 0);
   const [isPlaying, setIsPlaying] = useState(currentLevelIndex > 0);
-  const [isCompleted, setIsCompleted] = useState(false);
 
   const currentLevel = game.levels[currentLevelIndex];
   const totalLevels = game.levels.length;
@@ -84,15 +83,10 @@ export const CurrentGameArea = memo(function CurrentGameArea({
       </p>
 
       {/* Always show level content/rules */}
-      <LevelContent
-        level={currentLevel}
-        gameId={game.id}
-        isPlaying={isPlaying}
-        isCompleted={isCompleted}
-      />
+      <LevelContent level={currentLevel} gameId={game.id} isPlaying={isPlaying} />
 
       {/* Show game component only when playing */}
-      {isPlaying && !isCompleted && GameComponent && (
+      {isPlaying && GameComponent && (
         <div className="mb-6">
           <GameComponent level={currentLevel} onComplete={() => handleLevelSubmit(isLastLevel)} />
         </div>
@@ -108,12 +102,10 @@ export const CurrentGameArea = memo(function CurrentGameArea({
         isFirstLevel={isFirstLevel}
         isLastLevel={isLastLevel}
         isLoading={isLoading}
-        isPlaying={isPlaying}
         isGameStarted={isGameStarted}
         onStart={handleStart}
         onNext={handleNext}
         onFinish={handleFinish}
-        isDisabled={isCompleted}
       />
     </div>
   );

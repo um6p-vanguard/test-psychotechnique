@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // Import CurrentGameArea directly instead of using dynamic imports
 import { CurrentGameArea } from '@/components/game/current-game-area';
@@ -18,14 +18,12 @@ const initialGameStatuses: GameStatus[] = GAMES_DATA.map((_, index) =>
 );
 
 function CompletionMessage() {
-  const router = useRouter();
-
   return (
     <div className="space-y-6 py-10 text-center">
       <h2 className="text-2xl font-semibold text-green-600">Congratulations!</h2>
       <p className="mt-2 text-gray-500">You have completed all the games!</p>
-      <Button className="mt-4" onClick={() => router.push('/')}>
-        Return to Home
+      <Button className="mt-4" asChild>
+        <Link href="/">Return to Home</Link>
       </Button>
     </div>
   );
