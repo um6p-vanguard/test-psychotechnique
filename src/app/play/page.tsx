@@ -1,50 +1,21 @@
 'use client';
 
-import { useCallback, useMemo, useState, useTransition } from 'react';
-import { Suspense } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
-import { AlertTriangle } from 'lucide-react';
-
+// Import CurrentGameArea directly instead of using dynamic imports
+import { CurrentGameArea } from '@/components/game/current-game-area';
 import { GameProgressBar } from '@/components/game/game-progress-bar';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 
 import { GAMES_DATA } from '@/lib/data';
 import type { GameStatus } from '@/lib/types';
-
-// Dynamically import the CurrentGameArea to reduce initial load
-const CurrentGameArea = dynamic(
-  () =>
-    import('@/components/game/current-game-area').then((mod) => ({ default: mod.CurrentGameArea })),
-  {
-    loading: () => <GameAreaSkeleton />,
-    ssr: false,
-  },
-);
 
 // Initialize game statuses: first game active, others pending
 const initialGameStatuses: GameStatus[] = GAMES_DATA.map((_, index) =>
   index === 0 ? 'active' : 'pending',
 );
-
-function GameAreaSkeleton() {
-  return (
-    <div className="mx-auto w-full max-w-2xl space-y-4 px-4">
-      <div className="flex flex-col items-center space-y-2">
-        <Skeleton className="h-8 w-60" />
-        <Skeleton className="h-4 w-24" />
-      </div>
-      <Skeleton className="h-64 w-full rounded-lg" />
-      <div className="flex justify-center">
-        <Skeleton className="h-10 w-24" />
-      </div>
-    </div>
-  );
-}
 
 function CompletionMessage() {
   const router = useRouter();
@@ -52,7 +23,7 @@ function CompletionMessage() {
   return (
     <div className="space-y-6 py-10 text-center">
       <h2 className="text-2xl font-semibold text-green-600">Congratulations!</h2>
-      <p className="text-muted-foreground mt-2">You have completed all the games!</p>
+      <p className="mt-2 text-gray-500">You have completed all the games!</p>
       <Button className="mt-4" onClick={() => router.push('/')}>
         Return to Home
       </Button>
@@ -61,7 +32,6 @@ function CompletionMessage() {
 }
 
 export default function PlayPage() {
-  const [isPending, startTransition] = useTransition();
   const [currentGameIndex, setCurrentGameIndex] = useState(0);
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
   const [gameStatuses, setGameStatuses] = useState<GameStatus[]>(initialGameStatuses);
@@ -75,28 +45,26 @@ export default function PlayPage() {
     (_gameId: string, _levelId: string, isGameFinished: boolean) => {
       if (!currentGame) return;
 
-      startTransition(() => {
-        if (isGameFinished) {
-          // --- Game Finished ---
-          const nextGameIndex = currentGameIndex + 1;
-          setGameStatuses((prev) => {
-            const newStatuses = [...prev];
-            newStatuses[currentGameIndex] = 'passed';
+      if (isGameFinished) {
+        // --- Game Finished ---
+        const nextGameIndex = currentGameIndex + 1;
+        setGameStatuses((prev) => {
+          const newStatuses = [...prev];
+          newStatuses[currentGameIndex] = 'passed';
 
-            if (nextGameIndex < GAMES_DATA.length) newStatuses[nextGameIndex] = 'active';
+          if (nextGameIndex < GAMES_DATA.length) newStatuses[nextGameIndex] = 'active';
 
-            return newStatuses;
-          });
+          return newStatuses;
+        });
 
-          setCurrentGameIndex(nextGameIndex);
-          setCurrentLevelIndex(0); // Start at the first level of the new game
-        } else {
-          // --- Next Level within the same game ---
-          const nextLevelIndex = currentLevelIndex + 1;
-          if (nextLevelIndex < currentGame.levels.length) setCurrentLevelIndex(nextLevelIndex);
-          else console.error('Attempted to move past the last level without finishing the game.');
-        }
-      });
+        setCurrentGameIndex(nextGameIndex);
+        setCurrentLevelIndex(0); // Start at the first level of the new game
+      } else {
+        // --- Next Level within the same game ---
+        const nextLevelIndex = currentLevelIndex + 1;
+        if (nextLevelIndex < currentGame.levels.length) setCurrentLevelIndex(nextLevelIndex);
+        else console.error('Attempted to move past the last level without finishing the game.');
+      }
     },
     [currentGame, currentGameIndex, currentLevelIndex],
   );
@@ -115,20 +83,16 @@ export default function PlayPage() {
         currentGameIndex={currentGameIndex}
       />
 
-      <Suspense fallback={<GameAreaSkeleton />}>
-        {isPending ? (
-          <GameAreaSkeleton />
-        ) : currentGame ? (
-          <CurrentGameArea
-            key={`game-${currentGame.id}`}
-            game={currentGame}
-            currentLevelIndex={currentLevelIndex}
-            onLevelComplete={handleLevelComplete}
-          />
-        ) : (
-          <CompletionMessage />
-        )}
-      </Suspense>
+      {currentGame ? (
+        <CurrentGameArea
+          key={`game-${currentGame.id}`}
+          game={currentGame}
+          currentLevelIndex={currentLevelIndex}
+          onLevelComplete={handleLevelComplete}
+        />
+      ) : (
+        <CompletionMessage />
+      )}
     </main>
   );
 }

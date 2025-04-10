@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 
 import { submitLevelAnswer } from '@/lib/api';
 import type { Game } from '@/lib/types';
@@ -25,9 +25,6 @@ export const CurrentGameArea = memo(function CurrentGameArea({
   const [isGameStarted, setIsGameStarted] = useState(currentLevelIndex > 0);
   const [isPlaying, setIsPlaying] = useState(currentLevelIndex > 0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const hasSubmittedRef = useRef(false);
-  const prevLevelIndexRef = useRef<number>(currentLevelIndex);
-  const prevGameIdRef = useRef<string>(game.id);
 
   const currentLevel = game.levels[currentLevelIndex];
   const totalLevels = game.levels.length;
@@ -39,7 +36,7 @@ export const CurrentGameArea = memo(function CurrentGameArea({
 
   const handleLevelSubmit = useCallback(
     async (finishGame: boolean): Promise<void> => {
-      if (!currentLevel || hasSubmittedRef.current) return;
+      if (!currentLevel) return;
 
       setIsLoading(true);
       setError(null);
@@ -48,9 +45,8 @@ export const CurrentGameArea = memo(function CurrentGameArea({
         const response = await submitLevelAnswer(game.id, currentLevel.id);
 
         if (response.success) {
-          setIsCompleted(true);
-          setIsPlaying(false);
-          hasSubmittedRef.current = true;
+          // Immediately move to the next level or finish the game
+          // without showing the completion state
           onLevelComplete(game.id, currentLevel.id, finishGame);
         } else {
           setError(response.error || 'Failed to submit answer. Please try again.');
@@ -66,67 +62,24 @@ export const CurrentGameArea = memo(function CurrentGameArea({
   );
 
   const handleStart = useCallback(async (): Promise<void> => {
-    if (hasSubmittedRef.current) return;
     setIsGameStarted(true);
     setIsPlaying(true);
   }, []);
 
   const handleNext = useCallback(async (): Promise<void> => {
-    if (hasSubmittedRef.current) return;
-    setIsGameStarted(true);
     await handleLevelSubmit(false);
   }, [handleLevelSubmit]);
 
   const handleFinish = useCallback(async (): Promise<void> => {
-    if (hasSubmittedRef.current) return;
-    setIsGameStarted(true);
     await handleLevelSubmit(true);
   }, [handleLevelSubmit]);
-
-  // Handle level or game changes
-  useEffect(() => {
-    // Determine if we've changed game or level
-    const gameChanged = prevGameIdRef.current !== game.id;
-    const levelChanged = prevLevelIndexRef.current !== currentLevelIndex;
-
-    if (gameChanged || levelChanged) {
-      // Reset common state for any change
-      setIsCompleted(false);
-      setError(null);
-      hasSubmittedRef.current = false;
-
-      if (gameChanged) {
-        // Game has changed - start fresh
-        if (isFirstLevel) {
-          // First level of new game needs manual start
-          setIsGameStarted(false);
-          setIsPlaying(false);
-        } else {
-          // Non-first level of any game should auto-start
-          setIsGameStarted(true);
-          setIsPlaying(true);
-        }
-      } else if (levelChanged && !gameChanged) {
-        // Only the level changed within the same game
-        if (currentLevelIndex > 0) {
-          // Any non-first level should auto-play
-          setIsGameStarted(true);
-          setIsPlaying(true);
-        }
-      }
-
-      // Update refs to current values
-      prevGameIdRef.current = game.id;
-      prevLevelIndexRef.current = currentLevelIndex;
-    }
-  }, [game.id, currentLevelIndex, isFirstLevel]);
 
   if (!currentLevel) return <div>Error: Level data not found.</div>;
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4">
       <h2 className="mb-1 text-center text-2xl font-bold">{game.name}</h2>
-      <p className="text-muted-foreground mb-4 text-center">
+      <p className="mb-4 text-center text-gray-500">
         Level {currentLevelIndex + 1} / {totalLevels}
       </p>
 
@@ -147,7 +100,7 @@ export const CurrentGameArea = memo(function CurrentGameArea({
 
       {error && (
         <div className="mb-4 text-center">
-          <p className="text-destructive">{error}</p>
+          <p className="text-red-500">{error}</p>
         </div>
       )}
 
@@ -160,7 +113,7 @@ export const CurrentGameArea = memo(function CurrentGameArea({
         onStart={handleStart}
         onNext={handleNext}
         onFinish={handleFinish}
-        isDisabled={hasSubmittedRef.current && isCompleted}
+        isDisabled={isCompleted}
       />
     </div>
   );

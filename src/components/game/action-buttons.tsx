@@ -49,12 +49,12 @@ export const ActionButtons = memo(function ActionButtons({
         onClick={() => actionHandler()}
         disabled={isLoading || isDisabled}
         size="lg"
-        variant={isLastLevel ? 'success' : 'default'}
-        className="min-w-32 font-medium shadow-sm transition-all hover:shadow-md"
+        variant="default"
+        className="min-w-32 font-medium"
       >
         {isLoading ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="mr-2 h-4 w-4" />
             {loadingLabel}
           </>
         ) : (

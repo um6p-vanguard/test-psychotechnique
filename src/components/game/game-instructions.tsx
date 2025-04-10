@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { Brain, ChevronDown, ChevronUp, Clock, Gamepad2, Info } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -91,7 +91,7 @@ const GAME_SPECIFIC_INSTRUCTIONS = {
 export function GameInstructions({ level, gameId, isPlaying = false }: GameInstructionsProps) {
   const [isExpanded, setIsExpanded] = useState(!isPlaying);
 
-  // Update expansion state when isPlaying changes
+  // Update expansion state whenever isPlaying changes
   useEffect(() => {
     setIsExpanded(!isPlaying);
   }, [isPlaying]);
@@ -106,7 +106,6 @@ export function GameInstructions({ level, gameId, isPlaying = false }: GameInstr
       <CardHeader className="space-y-1 pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Brain className="text-primary h-5 w-5" />
             <CardTitle className="text-xl">{gameInstructions.title}</CardTitle>
           </div>
           <Button
@@ -124,28 +123,21 @@ export function GameInstructions({ level, gameId, isPlaying = false }: GameInstr
       {isExpanded && (
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 font-medium">
-              <Info className="text-muted-foreground h-4 w-4" />
-              Level Instructions
-            </div>
-            <p className="text-muted-foreground text-sm">{level.content}</p>
+            <div className="font-medium">Level Instructions</div>
+            <p className="text-sm text-gray-500">{level.content}</p>
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center gap-2 font-medium">
-              <Gamepad2 className="text-muted-foreground h-4 w-4" />
-              Game Rules
-            </div>
-            <ul className="text-muted-foreground ml-5 list-disc space-y-1 text-sm">
+            <div className="font-medium">Game Rules</div>
+            <ul className="ml-5 list-disc space-y-1 text-sm text-gray-500">
               {gameInstructions.rules.map((rule, index) => (
                 <li key={index}>{rule}</li>
               ))}
             </ul>
           </div>
 
-          <div className="bg-muted mt-4 flex items-center gap-2 rounded-md p-3">
-            <Clock className="text-muted-foreground h-4 w-4" />
-            <p className="text-muted-foreground text-sm">
+          <div className="mt-4 rounded-md bg-gray-100 p-3">
+            <p className="text-sm text-gray-500">
               Read the instructions carefully before starting. Good luck!
             </p>
           </div>
