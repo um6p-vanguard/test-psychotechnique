@@ -3,7 +3,7 @@
 import { memo } from 'react';
 
 import { cva } from 'class-variance-authority';
-import { Brain, Calculator, CheckCircle2, ListOrdered, Lock, Puzzle, Search } from 'lucide-react';
+import { CheckCircle2, Lock } from 'lucide-react';
 
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -17,15 +17,6 @@ interface GameProgressBarProps {
   currentGameIndex: number;
   onGameSelect?: (index: number) => void;
 }
-
-// Map icon names to Lucide components
-const iconMap: Record<string, React.ReactNode> = {
-  brain: <Brain className="h-5 w-5" />,
-  'list-ordered': <ListOrdered className="h-5 w-5" />,
-  puzzle: <Puzzle className="h-5 w-5" />,
-  search: <Search className="h-5 w-5" />,
-  calculator: <Calculator className="h-5 w-5" />,
-};
 
 // Define styles for the game indicators using cva
 const gameIndicatorStyles = cva(
@@ -76,7 +67,6 @@ export const GameProgressBar = memo(function GameProgressBar({
                 const isActive = status === 'active';
                 const isPassed = status === 'passed';
                 const isPending = status === 'pending';
-                const gameIcon = game.icon && iconMap[game.icon] ? iconMap[game.icon] : index + 1;
 
                 return (
                   <Tooltip key={game.id}>
@@ -99,7 +89,7 @@ export const GameProgressBar = memo(function GameProgressBar({
                               <Lock className="h-4 w-4" />
                             </div>
                           ) : (
-                            gameIcon
+                            game.icon
                           )}
                         </div>
 

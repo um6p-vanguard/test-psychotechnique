@@ -1,10 +1,12 @@
+import { Brain, Calculator, Puzzle, Search } from 'lucide-react';
+
 import type { Game } from './types';
 
 export const GAMES_DATA: Game[] = [
   {
     id: 'game-1',
     name: 'Memory Grid',
-    icon: 'brain',
+    icon: <Brain className="h-5 w-5" />,
     levels: [
       {
         id: 'g7-l1',
@@ -35,7 +37,7 @@ export const GAMES_DATA: Game[] = [
   {
     id: 'game-2',
     name: 'Sequence Order',
-    icon: 'puzzle',
+    icon: <Puzzle className="h-5 w-5" />,
     levels: [
       {
         id: 'g2-l1',
@@ -57,7 +59,7 @@ export const GAMES_DATA: Game[] = [
   {
     id: 'game-3',
     name: 'Word Find',
-    icon: 'search',
+    icon: <Search className="h-5 w-5" />,
     levels: [
       {
         id: 'g3-l1',
@@ -75,7 +77,7 @@ export const GAMES_DATA: Game[] = [
   {
     id: 'game-4',
     name: 'Quick Math',
-    icon: 'calculator',
+    icon: <Calculator className="h-5 w-5" />,
     levels: [
       {
         id: 'g4-l1',

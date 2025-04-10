@@ -9,7 +9,7 @@ export interface Level {
 export interface Game {
   id: string;
   name: string;
-  icon?: string; // Placeholder for icon path or component identifier
+  icon: React.ReactNode; // Placeholder for icon path or component identifier
   levels: Level[];
 }
 
