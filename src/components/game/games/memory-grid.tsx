@@ -2,11 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Card } from '@/components/ui/card';
-
 import { submitLevelAnswer } from '@/lib/api';
 
-import type { BaseGameProps } from './base-game';
+import type { BaseGameProps } from './index';
 
 type CellState = 'default' | 'highlighted' | 'selected';
 

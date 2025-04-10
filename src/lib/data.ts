@@ -2,9 +2,9 @@ import type { Game } from './types';
 
 export const GAMES_DATA: Game[] = [
   {
-    id: 'game-7',
+    id: 'game-1',
     name: 'Memory Grid',
-    icon: 'grid',
+    icon: 'brain',
     levels: [
       {
         id: 'g7-l1',
@@ -33,27 +33,9 @@ export const GAMES_DATA: Game[] = [
     ],
   },
   {
-    id: 'game-1',
-    name: 'Memory Match',
-    icon: 'brain',
-    levels: [
-      {
-        id: 'g1-l1',
-        title: 'Level 1',
-        content: 'Memorize the pairs! Rules for Memory Match Level 1.',
-      },
-      {
-        id: 'g1-l2',
-        title: 'Level 2',
-        content: 'More pairs to match. Rules for Memory Match Level 2.',
-      },
-      { id: 'g1-l3', title: 'Level 3', content: 'Final level! Rules for Memory Match Level 3.' },
-    ],
-  },
-  {
     id: 'game-2',
     name: 'Sequence Order',
-    icon: 'list-ordered',
+    icon: 'puzzle',
     levels: [
       {
         id: 'g2-l1',
@@ -106,50 +88,6 @@ export const GAMES_DATA: Game[] = [
         content: 'Addition and subtraction. Rules for Quick Math Level 2.',
       },
       { id: 'g4-l3', title: 'Level 3', content: 'Mixed operations. Rules for Quick Math Level 3.' },
-    ],
-  },
-  {
-    id: 'game-5',
-    name: 'Logic Puzzle',
-    icon: 'puzzle',
-    levels: [
-      {
-        id: 'g5-l1',
-        title: 'Level 1',
-        content: 'Simple deduction. Rules for Logic Puzzle Level 1.',
-      },
-      {
-        id: 'g5-l2',
-        title: 'Level 2',
-        content: 'More complex scenario. Rules for Logic Puzzle Level 2.',
-      },
-      {
-        id: 'g5-l3',
-        title: 'Level 3',
-        content: 'Challenging deductions. Rules for Logic Puzzle Level 3.',
-      },
-    ],
-  },
-  {
-    id: 'game-6',
-    name: 'Typing Test',
-    icon: 'keyboard',
-    levels: [
-      {
-        id: 'g6-l1',
-        title: 'Level 1',
-        content: 'Type the sentence quickly. Rules for Typing Test Level 1.',
-      },
-      {
-        id: 'g6-l2',
-        title: 'Level 2',
-        content: 'Longer paragraph. Rules for Typing Test Level 2.',
-      },
-      {
-        id: 'g6-l3',
-        title: 'Level 3',
-        content: 'Complex text with symbols. Rules for Typing Test Level 3.',
-      },
     ],
   },
 ];

@@ -1,6 +1,6 @@
 'use client';
 
-import type { BaseGameProps } from './base-game';
+import type { BaseGameProps } from './index';
 
 export function SequenceOrder({ level, onComplete }: BaseGameProps) {
   return (

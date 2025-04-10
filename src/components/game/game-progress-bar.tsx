@@ -3,16 +3,7 @@
 import { memo } from 'react';
 
 import { cva } from 'class-variance-authority';
-import {
-  Brain,
-  Calculator,
-  CheckCircle2,
-  Keyboard,
-  ListOrdered,
-  Lock,
-  Puzzle,
-  Search,
-} from 'lucide-react';
+import { Brain, Calculator, CheckCircle2, ListOrdered, Lock, Puzzle, Search } from 'lucide-react';
 
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -31,10 +22,9 @@ interface GameProgressBarProps {
 const iconMap: Record<string, React.ReactNode> = {
   brain: <Brain className="h-5 w-5" />,
   'list-ordered': <ListOrdered className="h-5 w-5" />,
+  puzzle: <Puzzle className="h-5 w-5" />,
   search: <Search className="h-5 w-5" />,
   calculator: <Calculator className="h-5 w-5" />,
-  puzzle: <Puzzle className="h-5 w-5" />,
-  keyboard: <Keyboard className="h-5 w-5" />,
 };
 
 // Define styles for the game indicators using cva
