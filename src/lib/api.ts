@@ -57,12 +57,7 @@ function wait(ms: number, signal?: AbortSignal): Promise<void> {
  * @param timeoutMs - Optional timeout in milliseconds (defaults to 5000ms)
  * @returns Promise with submission result
  */
-export async function submitLevelAnswer(
-  gameId: string,
-  levelId: string,
-  gameData?: Record<string, any>,
-  timeoutMs = 5000,
-): Promise<ApiResponse<void>> {
+export async function submitLevelAnswer(answer: any, timeoutMs = 5000): Promise<ApiResponse<void>> {
   const { signal, abort } = createAbortController();
 
   // Set a timeout to abort the request if it takes too long
@@ -71,38 +66,10 @@ export async function submitLevelAnswer(
   }, timeoutMs);
 
   try {
-    console.log(`Submitting answer for ${gameId}, ${levelId}...`);
+    console.log(`Submitting answer...`);
     await wait(500, signal); // Simulate network latency
 
-    // Create a game result entry
-    const result: GameResult = {
-      gameId,
-      levelId,
-      timestamp: new Date().toISOString(),
-      score: gameData?.score || 100, // Default to 100 if no score provided
-      duration: gameData?.duration || 0,
-      success: true,
-      attempts: gameData?.attempts || 1,
-      studentData: gameData,
-    };
-
-    // Save the result (in memory for this demo)
-    gameResults.push(result);
-    console.log('Game results saved:', result);
-
-    // In a real app, you'd send data to your backend endpoint
-    const success = Math.random() > 0.1; // Simulate occasional failure (10% chance)
-
-    if (success) {
-      console.log(`Answer submitted successfully for ${gameId}, ${levelId}.`);
-      return { success: true };
-    }
-
-    console.error(`Failed to submit answer for ${gameId}, ${levelId}.`);
-    return {
-      success: false,
-      error: 'Server rejected the answer. Please try again.',
-    };
+    return { success: true };
   } catch (error) {
     // Handle abort or other errors
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -118,21 +85,4 @@ export async function submitLevelAnswer(
   } finally {
     clearTimeout(timeoutId);
   }
-}
-
-/**
- * Get all game results (for reporting/analytics)
- * @returns All saved game results
- */
-export function getGameResults(): GameResult[] {
-  return [...gameResults]; // Return a copy to prevent mutation
-}
-
-/**
- * Get results for a specific student
- * @param studentId - Student identifier
- * @returns Game results for the specified student
- */
-export function getStudentResults(studentId: string): GameResult[] {
-  return gameResults.filter((result) => result.studentData?.studentId === studentId);
 }

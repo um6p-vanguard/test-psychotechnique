@@ -7,6 +7,13 @@ export const GAMES_DATA: Game[] = [
     id: 'game-1',
     name: 'Memory Grid',
     icon: <Brain className="h-5 w-5" />,
+    description: 'Test and improve your memory by matching pairs of cards',
+    rules: [
+      'Click on cards to reveal them',
+      'Match pairs of identical cards',
+      'Remember card positions',
+      'Complete the level within the time limit',
+    ],
     levels: [
       {
         id: 'g7-l1',
@@ -38,6 +45,13 @@ export const GAMES_DATA: Game[] = [
     id: 'game-2',
     name: 'Sequence Order',
     icon: <Puzzle className="h-5 w-5" />,
+    description: 'Remember and repeat sequences in the correct order',
+    rules: [
+      'Watch the sequence carefully',
+      'Repeat the sequence in the same order',
+      'Each level adds more complexity',
+      'Complete within the given attempts',
+    ],
     levels: [
       {
         id: 'g2-l1',
@@ -60,6 +74,13 @@ export const GAMES_DATA: Game[] = [
     id: 'game-3',
     name: 'Word Find',
     icon: <Search className="h-5 w-5" />,
+    description: 'Find hidden words in a grid of letters',
+    rules: [
+      'Click and drag to select letters',
+      'Words can be horizontal, vertical, or diagonal',
+      'Find all words to complete the level',
+      'Watch out for time limits',
+    ],
     levels: [
       {
         id: 'g3-l1',
@@ -78,6 +99,13 @@ export const GAMES_DATA: Game[] = [
     id: 'game-4',
     name: 'Quick Math',
     icon: <Calculator className="h-5 w-5" />,
+    description: 'Solve mathematical problems quickly and accurately',
+    rules: [
+      'Solve equations within time limit',
+      'Type your answer using number keys',
+      'Press Enter to submit',
+      'Accuracy matters more than speed',
+    ],
     levels: [
       {
         id: 'g4-l1',

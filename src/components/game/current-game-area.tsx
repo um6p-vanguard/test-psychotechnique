@@ -1,64 +1,50 @@
 'use client';
 
-import { memo, useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { submitLevelAnswer } from '@/lib/api';
 import type { Game } from '@/lib/types';
 
 import { ActionButtons } from './action-buttons';
+import { GameInstructions } from './game-instructions';
 import { GAME_COMPONENTS } from './games';
-import { LevelContent } from './level-content';
 
 interface CurrentGameAreaProps {
   game: Game;
   currentLevelIndex: number;
-  onLevelComplete: (gameId: string, levelId: string, isGameFinished: boolean) => void;
 }
 
-export const CurrentGameArea = memo(function CurrentGameArea({
-  game,
-  currentLevelIndex,
-  onLevelComplete,
-}: CurrentGameAreaProps) {
+export const CurrentGameArea = ({ game, currentLevelIndex }: CurrentGameAreaProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isGameStarted, setIsGameStarted] = useState(currentLevelIndex > 0);
   const [isPlaying, setIsPlaying] = useState(currentLevelIndex > 0);
 
+  const GameComponent = useMemo(() => GAME_COMPONENTS[game.id], [game.id]);
   const currentLevel = game.levels[currentLevelIndex];
   const totalLevels = game.levels.length;
   const isFirstLevel = currentLevelIndex === 0;
   const isLastLevel = currentLevelIndex === totalLevels - 1;
 
   // Get the appropriate game component
-  const GameComponent = GAME_COMPONENTS[game.id];
 
-  const handleLevelSubmit = useCallback(
-    async (finishGame: boolean): Promise<void> => {
-      if (!currentLevel) return;
+  const handleLevelSubmit = useCallback(async (): Promise<void> => {
+    if (!currentLevel) return;
 
-      setIsLoading(true);
-      setError(null);
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        const response = await submitLevelAnswer(game.id, currentLevel.id);
-
-        if (response.success) {
-          // Immediately move to the next level or finish the game
-          // without showing the completion state
-          onLevelComplete(game.id, currentLevel.id, finishGame);
-        } else {
-          setError(response.error || 'Failed to submit answer. Please try again.');
-        }
-      } catch (err) {
-        console.error('Error submitting level:', err);
-        setError('An unexpected error occurred. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [currentLevel, game.id, onLevelComplete],
-  );
+    try {
+      await submitLevelAnswer('test');
+      // Immediately move to the next level or finish the game
+      // without showing the completion state
+    } catch (err) {
+      console.error('Error submitting level:', err);
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentLevel, game.id]);
 
   const handleStart = useCallback(async (): Promise<void> => {
     setIsGameStarted(true);
@@ -66,11 +52,7 @@ export const CurrentGameArea = memo(function CurrentGameArea({
   }, []);
 
   const handleNext = useCallback(async (): Promise<void> => {
-    await handleLevelSubmit(false);
-  }, [handleLevelSubmit]);
-
-  const handleFinish = useCallback(async (): Promise<void> => {
-    await handleLevelSubmit(true);
+    await handleLevelSubmit();
   }, [handleLevelSubmit]);
 
   if (!currentLevel) return <div>Error: Level data not found.</div>;
@@ -83,14 +65,10 @@ export const CurrentGameArea = memo(function CurrentGameArea({
       </p>
 
       {/* Always show level content/rules */}
-      <LevelContent level={currentLevel} gameId={game.id} isPlaying={isPlaying} />
+      <GameInstructions level={currentLevel} gameId={game.id} isPlaying={isPlaying} />
 
       {/* Show game component only when playing */}
-      {isPlaying && GameComponent && (
-        <div className="mb-6">
-          <GameComponent level={currentLevel} onComplete={() => handleLevelSubmit(isLastLevel)} />
-        </div>
-      )}
+      {isPlaying && GameComponent && <GameComponent level={currentLevel} />}
 
       {error && (
         <div className="mb-4 text-center">
@@ -105,11 +83,11 @@ export const CurrentGameArea = memo(function CurrentGameArea({
         isGameStarted={isGameStarted}
         onStart={handleStart}
         onNext={handleNext}
-        onFinish={handleFinish}
+        onFinish={handleNext}
       />
     </div>
   );
-});
+};
 
 // Also export as default for dynamic import
 export default CurrentGameArea;

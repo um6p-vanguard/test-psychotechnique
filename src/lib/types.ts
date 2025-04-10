@@ -11,6 +11,8 @@ export interface Game {
   name: string;
   icon: React.ReactNode; // Placeholder for icon path or component identifier
   levels: Level[];
+  description: string;
+  rules: string[];
 }
 
 export interface AppState {

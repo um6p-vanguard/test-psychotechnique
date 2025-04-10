@@ -7,6 +7,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
+import { GAMES_DATA } from '@/lib/data';
 import type { Level } from '@/lib/types';
 
 interface GameInstructionsProps {
@@ -15,78 +16,21 @@ interface GameInstructionsProps {
   isPlaying?: boolean;
 }
 
-const GAME_SPECIFIC_INSTRUCTIONS = {
-  'game-1': {
-    title: 'Memory Match',
-    description: 'Test and improve your memory by matching pairs of cards',
-    rules: [
-      'Click on cards to reveal them',
-      'Match pairs of identical cards',
-      'Remember card positions',
-      'Complete the level within the time limit',
-    ],
-  },
-  'game-2': {
-    title: 'Sequence Order',
-    description: 'Remember and repeat sequences in the correct order',
-    rules: [
-      'Watch the sequence carefully',
-      'Repeat the sequence in the same order',
-      'Each level adds more complexity',
-      'Complete within the given attempts',
-    ],
-  },
-  'game-3': {
-    title: 'Word Find',
-    description: 'Find hidden words in a grid of letters',
-    rules: [
-      'Click and drag to select letters',
-      'Words can be horizontal, vertical, or diagonal',
-      'Find all words to complete the level',
-      'Watch out for time limits',
-    ],
-  },
-  'game-4': {
-    title: 'Quick Math',
-    description: 'Solve mathematical problems quickly and accurately',
-    rules: [
-      'Solve equations within time limit',
-      'Type your answer using number keys',
-      'Press Enter to submit',
-      'Accuracy matters more than speed',
-    ],
-  },
-  'game-5': {
-    title: 'Logic Puzzle',
-    description: 'Use deductive reasoning to solve puzzles',
-    rules: [
-      'Read all clues carefully',
-      'Use process of elimination',
-      'All answers are logical',
-      'Take notes if needed',
-    ],
-  },
-  'game-6': {
-    title: 'Typing Test',
-    description: 'Test your typing speed and accuracy',
-    rules: [
-      'Type exactly what you see',
-      'Mind punctuation and capitalization',
-      'Accuracy affects your score',
-      'Complete within time limit',
-    ],
-  },
-  'game-7': {
-    title: 'Memory Grid',
-    description: 'Test your spatial memory by remembering patterns in a grid',
-    rules: [
-      'Observe the highlighted cells carefully',
-      'Remember their positions in the grid',
-      'Recreate the pattern by clicking on the same cells',
-      'Difficulty increases with each level',
-    ],
-  },
-};
+interface GameInstruction {
+  title: string;
+  description: string;
+  rules: string[];
+}
+
+const GAME_SPECIFIC_INSTRUCTIONS: Record<string, GameInstruction> = {};
+
+GAMES_DATA.forEach((game) => {
+  GAME_SPECIFIC_INSTRUCTIONS[game.id] = {
+    title: game.name,
+    description: game.description,
+    rules: game.rules,
+  };
+});
 
 export function GameInstructions({ level, gameId, isPlaying = false }: GameInstructionsProps) {
   const [isExpanded, setIsExpanded] = useState(!isPlaying);
@@ -96,29 +40,23 @@ export function GameInstructions({ level, gameId, isPlaying = false }: GameInstr
     setIsExpanded(!isPlaying);
   }, [isPlaying]);
 
-  const gameInstructions =
-    GAME_SPECIFIC_INSTRUCTIONS[gameId as keyof typeof GAME_SPECIFIC_INSTRUCTIONS];
+  const gameInstructions = GAME_SPECIFIC_INSTRUCTIONS[gameId];
 
   if (!gameInstructions) return null;
 
   return (
     <Card className="mb-6">
-      <CardHeader className="space-y-1 pb-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-xl">{gameInstructions.title}</CardTitle>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-        </div>
+      <div className="flex items-center justify-between px-4">
         <CardDescription>{gameInstructions.description}</CardDescription>
-      </CardHeader>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </Button>
+      </div>
 
       {isExpanded && (
         <CardContent className="space-y-4">

@@ -9,10 +9,11 @@ export * from './memory-grid';
 export * from './sequence-order';
 export * from './word-find';
 export * from './quick-math';
+
 export interface BaseGameProps {
   level: Level;
-  onComplete: () => void;
 }
+
 // Map game IDs to their respective components
 export const GAME_COMPONENTS: Record<string, React.ComponentType<BaseGameProps>> = {
   'game-1': MemoryGrid,
